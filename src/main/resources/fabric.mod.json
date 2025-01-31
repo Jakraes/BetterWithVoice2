@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "id": "betterwithvoice",
+  "version": "${version}",
+
+  "name": "Better With Voice",
+  "description": "Yabadabadoo.",
+  "authors": [
+    "Jakraes"
+  ],
+  "contact": {
+    "homepage": "",
+    "sources": ""
+  },
+
+	"icon": "icon.png",
+  "license": "CC0-1.0",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+			"jakraes.betterwithvoice.BetterWithVoice"
+    ],
+		"beforeGameStart": [
+			"jakraes.betterwithvoice.BetterWithVoice"
+		],
+		"afterGameStart": [
+			"jakraes.betterwithvoice.BetterWithVoice"
+		]
+	},
+  "mixins": [
+      "betterwithvoice.mixins.json"
+  ],
+
+  "depends": {
+		"minecraft": "*",
+    "fabricloader": ">=0.15.5"
+  },
+  "suggests": {
+  }
+}
