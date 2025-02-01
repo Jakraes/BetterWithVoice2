@@ -20,13 +20,7 @@
   "entrypoints": {
     "main": [
 			"jakraes.betterwithvoice.BetterWithVoice"
-    ],
-		"beforeGameStart": [
-			"jakraes.betterwithvoice.BetterWithVoice"
-		],
-		"afterGameStart": [
-			"jakraes.betterwithvoice.BetterWithVoice"
-		]
+    ]
 	},
   "mixins": [
       "betterwithvoice.mixins.json"

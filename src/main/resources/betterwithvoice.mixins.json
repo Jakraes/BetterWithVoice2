@@ -4,8 +4,14 @@
     "package": "jakraes.betterwithvoice.mixin",
     "compatibilityLevel": "JAVA_8",
     "mixins": [
+      "MinecraftServerMixin",
+      "PacketHandlerClientMixin"
     ],
     "client": [
+      "PacketHandlerClientMixin"
+    ],
+    "server": [
+      "MinecraftServerMixin"
     ],
     "injectors": {
         "defaultRequire": 1
