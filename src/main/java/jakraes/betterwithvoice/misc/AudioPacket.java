@@ -1,17 +1,16 @@
 package jakraes.betterwithvoice.misc;
 
-import java.io.Serializable;
-
-public class AudioPacket implements Serializable {
+public class AudioPacket implements java.io.Serializable {
 	public byte[] buffer;
 	public int bufferSize;
-	public int x, y, z;
+	public double sourceX, sourceY, sourceZ; // Add source position
 
 	public AudioPacket(byte[] buffer, int bufferSize) {
 		this.buffer = buffer;
 		this.bufferSize = bufferSize;
-		x = 0;
-		y = 0;
-		z = 0;
+	}
+
+	public AudioPacket() {
+		// Default constructor for deserialization
 	}
 }

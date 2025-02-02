@@ -38,9 +38,13 @@ public class Server {
 			BetterWithVoice.LOGGER.error("Server failed to create server socket.");
 			throw new RuntimeException(e);
 		}
+
+		BetterWithVoice.LOGGER.info("Server socket initialized.");
 	}
 
 	public void startListening() {
+		BetterWithVoice.LOGGER.info("Server listening.");
+
 		listenerThread = new Thread(() -> {
 			while (!listenerThread.isInterrupted()) {
 				Socket socket;
@@ -57,10 +61,15 @@ public class Server {
 				helperList.add(helper);
 
 				helper.start();
+				BetterWithVoice.LOGGER.info("Server launched ServerHelper.");
 			}
 		});
 
 		listenerThread.start();
+	}
+
+	private synchronized void removeHelper(ServerHelper helper) {
+		helperList.remove(helper);
 	}
 
 	private class ServerHelper extends Thread {
@@ -75,6 +84,12 @@ public class Server {
 				inputStream = new ObjectInputStream(socket.getInputStream());
 			} catch (IOException e) {
 				BetterWithVoice.LOGGER.error("ServerHelper failed to get input stream.");
+				try {
+					socket.close();
+				} catch (IOException ex) {
+					BetterWithVoice.LOGGER.error("ServerHelper failed to close socket.");
+					throw new RuntimeException(ex);
+				}
 				throw new RuntimeException(e);
 			}
 
@@ -82,38 +97,58 @@ public class Server {
 				outputStream = new ObjectOutputStream(socket.getOutputStream());
 			} catch (IOException e) {
 				BetterWithVoice.LOGGER.error("ServerHelper failed to get output stream.");
+				try {
+					socket.close();
+				} catch (IOException ex) {
+					BetterWithVoice.LOGGER.error("ServerHelper failed to close socket.");
+					throw new RuntimeException(ex);
+				}
 				throw new RuntimeException(e);
 			}
 		}
 
 		@Override
 		public void run() {
-			while (!isInterrupted()) {
-				AudioPacket packet;
+			while (!socket.isClosed()) {
+				AudioPacket packet = new AudioPacket();
 
 				try {
 					packet = (AudioPacket) inputStream.readObject();
 				} catch (IOException e) {
-					BetterWithVoice.LOGGER.error("ServerHelper failed to read object.");
-					throw new RuntimeException(e);
+					BetterWithVoice.LOGGER.warn("ServerHelper failed to read object.");
+					closeSocket();
 				} catch (ClassNotFoundException e) {
 					BetterWithVoice.LOGGER.error("ServerHelper failed to find AudioPacket class.");
+					closeSocket();
 					throw new RuntimeException(e);
 				}
 
 				for (ServerHelper helper : helperList) {
+					if (helper == this) continue;
+
 					try {
 						helper.getOutputStream().writeObject(packet);
 					} catch (IOException e) {
-						BetterWithVoice.LOGGER.error("ServerHelper failed to write object.");
-						throw new RuntimeException(e);
+						BetterWithVoice.LOGGER.warn("ServerHelper failed to write object.");
 					}
 				}
 			}
+
+			removeHelper(this);
+
+			BetterWithVoice.LOGGER.info("ServerHelper finished.");
 		}
 
 		public ObjectOutputStream getOutputStream() {
 			return outputStream;
+		}
+
+		private void closeSocket() {
+			try {
+				socket.close();
+			} catch (IOException e) {
+				BetterWithVoice.LOGGER.error("ServerHelper failed to close socket.");
+			}
 		}
 	}
 }

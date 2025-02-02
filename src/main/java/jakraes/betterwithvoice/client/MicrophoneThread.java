@@ -43,6 +43,7 @@ public class MicrophoneThread extends Thread {
 	public void close() {
 		BetterWithVoice.LOGGER.info("MicrophoneThread close().");
 		recording = false;
+		microphone.flush();
 		microphone.stop();
 	}
 
@@ -64,18 +65,23 @@ public class MicrophoneThread extends Thread {
 
 			byte[] buffer = new byte[Audio.BUFFER_SIZE];
 			int size = microphone.read(buffer, 0, Audio.BUFFER_SIZE);
-			BetterWithVoice.LOGGER.info("MicrophoneThread read {} bytes.", size);
 
 			AudioPacket packet = new AudioPacket(buffer, size);
+
+			// Set source position
+			packet.sourceX = Client.getInstance().getX();
+			packet.sourceY = Client.getInstance().getY();
+			packet.sourceZ = Client.getInstance().getZ();
 
 			try {
 				outputStream.writeObject(packet);
 			} catch (IOException e) {
-				BetterWithVoice.LOGGER.error("MicrophoneThread failed to write object.");
-				throw new RuntimeException(e);
+				BetterWithVoice.LOGGER.warn("MicrophoneThread failed to write object.");
 			}
 		}
 
 		microphone.close();
+
+		BetterWithVoice.LOGGER.info("MicrophoneThread finished.");
 	}
 }

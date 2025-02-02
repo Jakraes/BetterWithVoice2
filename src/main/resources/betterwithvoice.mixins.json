@@ -6,10 +6,12 @@
   "mixins": [
     "MinecraftServerMixin",
     "NetClientHandlerMixin",
+    "NetworkManagerMixin",
     "PlayerInputMixin"
   ],
   "client": [
     "NetClientHandlerMixin",
+    "NetworkManagerMixin",
     "PlayerInputMixin"
   ],
   "server": [
